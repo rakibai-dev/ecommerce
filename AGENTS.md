@@ -25,7 +25,7 @@ Single-vendor demo store. Verified facts only; anything marked "(observed)" was 
 ## Commands / package manager (npm)
 
 - Setup order for fresh local dev: `docker compose up -d db` → `npm install` → `npm run db:migrate` → `npm run db:seed` → `npm run dev`.
-- Scripts: `dev`, `build`, `start`, `lint` (bare `eslint`), plus `db:generate`, `db:migrate`, `db:seed`, `db:deploy-migrations`, `db:studio`. Lint is currently clean (0 problems).
+- Scripts: `dev`, `build` = `prisma generate && next build` (any Node host needs the generate step — engine binaries are platform-specific), `start`, `lint` (bare `eslint`), plus `db:generate`, `db:migrate`, `db:seed`, `db:deploy-migrations`, `db:studio`. Lint is currently clean (0 problems). `engines.node` is pinned `>=22` and `vercel.json` pins the Vercel build command to `npm run build` (the Next.js preset would otherwise use bare `next build` and skip generate). Do not set `STANDALONE=1` outside the Docker builder. Free-deploy recipe: `DEPLOY.md`.
 - npm 12 gates lifecycle scripts; `allowScripts` in `package.json` whitelists `@prisma/client`, `prisma`, `@prisma/engines`, `esbuild`, `unrs-resolver`. Fresh installs rely on this.
 - `npm run build` type-checks; it runs fine with no live DB (all DB reads stream inside Suspense at request time).
 

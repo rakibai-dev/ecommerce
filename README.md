@@ -63,7 +63,7 @@ Sign in on `/login` to unlock `/admin` (stats, product CRUD, order status).
 | Script                      | What it does                          |
 | --------------------------- | ------------------------------------- |
 | `dev`                       | `next dev` (Turbopack)                |
-| `build`                     | `next build` (type-checks too)        |
+| `build`                     | `prisma generate` + `next build` (type-checks too)   |
 | `start`                     | `next start` (prod server)            |
 | `lint`                      | ESLint                                |
 | `test`                      | Vitest unit tests (single run)        |
@@ -95,3 +95,4 @@ Sign in on `/login` to unlock `/admin` (stats, product CRUD, order status).
   Dockerfile). Never set `output: "standalone"` unconditionally — `next start` cannot
   serve standalone builds (see `AGENTS.md` for the full rationale).
 - Agent/repository conventions live in [`AGENTS.md`](AGENTS.md).
+- **Deploying free** (Vercel + Neon recipe, env vars, alternatives): [`DEPLOY.md`](DEPLOY.md).
