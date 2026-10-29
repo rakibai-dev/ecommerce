@@ -1,0 +1,52 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: store
+      POSTGRES_PASSWORD: store
+      POSTGRES_DB: store
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U store -d store"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  # One-shot migration job: the app image (standalone output) has no Prisma CLI.
+  migrate:
+    build:
+      context: .
+      target: deps
+    command: npx prisma migrate deploy
+    environment:
+      DATABASE_URL: postgresql://store:store@db:5432/store
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://store:store@db:5432/store
+      AUTH_SECRET: dev-only-secret-rotate-me
+      AUTH_TRUST_HOST: "true"
+      # Pin the public origin. Without this, Auth.js (AUTH_TRUST_HOST) derives
+      # the origin from the server bind address (HOSTNAME=0.0.0.0 in the
+      # standalone runner) and every auth redirect points to
+      # http://0.0.0.0:3000/. Change when exposing the app on another origin.
+      AUTH_URL: http://localhost:3000
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  pgdata:
